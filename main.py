@@ -1,16 +1,21 @@
-# This is a sample Python script.
+import os
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from telegram.ext import Application, CommandHandler
 
+from dotenv import load_dotenv
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from src.query_bot import QueryBot
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    load_dotenv()
+    BOT_TOKEN = os.getenv('BOT_TOKEN')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    application = Application.builder().token(BOT_TOKEN).build()
+
+    QueryBot.file_path = "bot.json"
+    QueryBot.app = application
+    QueryBot.init()
+
+    application.add_handler(CommandHandler('start', QueryBot.base_handler))
+
+    application.run_polling()

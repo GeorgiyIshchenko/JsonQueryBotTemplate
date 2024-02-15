@@ -1,0 +1,33 @@
+{
+  "message_title": "Root menu",
+  "children": [
+    {
+      "button_name": "Option1",
+      "message_title": "option 1",
+      "children": [
+        {
+          "button_name": "Option1.2",
+          "message_title": "option 1.2"
+        },
+        {
+          "button_name": "Option1.3",
+          "message_title": "option 1.3"
+        }
+      ]
+    },
+    {
+      "button_name": "Option2",
+      "message_title": "option 2",
+      "children": [
+        {
+          "button_name": "Option2.2",
+          "message_title": "option 2.2"
+        },
+        {
+          "button_name": "Option2.3",
+          "message_title": "option2.3"
+        }
+      ]
+    }
+  ]
+}
