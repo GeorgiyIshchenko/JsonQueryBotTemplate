@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, ContextTypes, CallbackQueryHandler
@@ -14,7 +14,14 @@ class QueryNode(object):
     image_path: str = None
     video_path: str = None
     previous: int = None
-    children: list = None
+    url_buttons: list = field(default_factory=list)
+    children: list = field(default_factory=list)
+
+
+@dataclass
+class UrlButton(object):
+    name: str
+    url: str
 
 
 class QueryBot(object):
@@ -48,6 +55,9 @@ class QueryBot(object):
             child = QueryBot.callbacks[child_id]
             keyboard.append([InlineKeyboardButton(text=child.button_name, callback_data=str(child_id))])
 
+        for url_button in node.url_buttons:
+            keyboard.append([InlineKeyboardButton(text=url_button.name, url=url_button.url)])
+
         if node.previous:
             keyboard.append([InlineKeyboardButton(text="Назад", callback_data=str(node.previous))])
 
@@ -64,7 +74,6 @@ class QueryBot(object):
         else:
             await message.reply_text(text=node.message_title, reply_markup=reply_markup)
 
-
     @staticmethod
     def unpack_recursive(node: QueryNode, child_data: dict) -> None:
         child: QueryNode = QueryNode()
@@ -76,7 +85,10 @@ class QueryBot(object):
         child.image_path = child_data.get("image_path", None)
         child.video_path = child_data.get("video_path", None)
         child.previous = node.callback_id
-        child.children = list()
+
+        for url_button_data in child_data.get("url_buttons", list()):
+            button: UrlButton = UrlButton(name=url_button_data.get("name"), url=url_button_data.get("url"))
+            child.url_buttons.append(button)
 
         QueryBot.callbacks[node_id] = child
         node.children.append(node_id)
@@ -91,7 +103,6 @@ class QueryBot(object):
 
         root_json = json.load(open(QueryBot.file_path, 'r', encoding='utf-8'))
         root: QueryNode = QueryNode(message_title=root_json['message_title'])
-        root.children = list()
         root_children = root_json['children']
 
         root_id = QueryBot.get_current_node_id()
@@ -100,6 +111,7 @@ class QueryBot(object):
 
         for i in range(len(root_children)):
             QueryBot.unpack_recursive(root, root_children[i])
+
         for i in QueryBot.callbacks.items():
             print(i)
 

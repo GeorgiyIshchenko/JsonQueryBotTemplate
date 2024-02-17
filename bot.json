@@ -4,6 +4,12 @@
     {
       "button_name": "Option1",
       "message_title": "option 1",
+      "url_buttons": [
+        {
+          "name": "Google",
+          "url": "https://www.google.com/"
+        }
+      ],
       "children": [
         {
           "button_name": "Option1.2",
